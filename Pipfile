@@ -9,6 +9,7 @@ sklearn = "*"
 ipykernel = "*"
 matplotlib = "*"
 seaborn = "*"
+yfinance = "*"
 
 [dev-packages]
 
