@@ -3,6 +3,16 @@ stock_market_index_daily_direction
 
 A short description of the project.
 
+``` dot
+
+digraph G{
+    "rt-1" -> rt
+    "rt-5" -> rt
+    "rt-37" -> rt
+}
+
+```
+
 Project Organization
 ------------
 
