@@ -10,6 +10,9 @@ ipykernel = "*"
 matplotlib = "*"
 seaborn = "*"
 yfinance = "*"
+pomegranate = "*"
+pgmpy = "*"
+jupyterlab = "*"
 
 [dev-packages]
 
