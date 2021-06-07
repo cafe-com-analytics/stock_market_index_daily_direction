@@ -13,6 +13,9 @@ yfinance = "*"
 pomegranate = "*"
 pgmpy = "*"
 jupyterlab = "*"
+openpyxl = "*"
+requests = "*"
+bs4 = "*"
 
 [dev-packages]
 
