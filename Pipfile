@@ -16,6 +16,7 @@ jupyterlab = "*"
 openpyxl = "*"
 requests = "*"
 bs4 = "*"
+streamlit = "*"
 
 [dev-packages]
 
