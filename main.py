@@ -7,6 +7,8 @@ import streamlit as st
 import yfinance as yf
 
 from src.features.build_features import uniform_clustering, create_shifted_rt
+from src.models.train_model import train_model
+from src.models.predict_model import predict_model
 
 st.set_page_config(page_title="Market index direction w/ bayesian network", page_icon=":chart_with_upwards_trend:", layout='wide', initial_sidebar_state='auto')
 
@@ -32,8 +34,24 @@ def main():
 
     df = create_shifted_rt(df, [1, 5, 37])
 
-    df_clusterd = uniform_clustering(df[["Close", "rt", "rt-1", "rt-5", "rt-37"]], ["rt", "rt-1", "rt-5", "rt-37"])
-    df_clusterd.dropna(how="any", axis=0, inplace=True)
+    df_clustered = uniform_clustering(df[["Close", "rt", "rt-1", "rt-5", "rt-37"]], ["rt", "rt-1", "rt-5", "rt-37"])
+    df_clustered.dropna(how="any", axis=0, inplace=True)
+
+    lst_relations = [('cluster_rt-37', 'cluster_rt'), ('cluster_rt-5', 'cluster_rt'), ('cluster_rt-1', 'cluster_rt')]
+
+    df_clustered = df_clustered[["cluster_rt-37", "cluster_rt-5", "cluster_rt-1", "cluster_rt"]]
+
+    model = train_model(df_clustered, lst_relations)
+
+    evidence = {
+    'cluster_rt-37': df_clustered.iloc[-37]['cluster_rt'],
+    'cluster_rt-5': df_clustered.iloc[-5]['cluster_rt'],
+    'cluster_rt-1': df_clustered.iloc[-1]['cluster_rt']
+    }
+
+    predict = predict_model(model, evidence=evidence)
+
+    st.text(predict[0])
 
     # fig = plt.figure(figsize=(20, 4))
     # ax = fig.add_subplot(111)
@@ -53,7 +71,9 @@ def main():
 
     st.line_chart(df["rt"])
 
-    st.dataframe(df_clusterd)
+    st.dataframe(df_clustered.iloc[-1])
+
+    
 
 
 
