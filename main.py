@@ -41,7 +41,7 @@ def main():
 
     df_clustered = df_clustered[["cluster_rt-37", "cluster_rt-5", "cluster_rt-1", "cluster_rt"]]
 
-    model = train_model(df_clustered, lst_relations)
+    model = train_model(df_clustered.iloc[:-10], lst_relations)
 
     evidence = {
     'cluster_rt-37': df_clustered.iloc[-37]['cluster_rt'],
@@ -51,7 +51,26 @@ def main():
 
     predict = predict_model(model, evidence=evidence)
 
-    st.text(predict[0])
+    st.text(f"Previsão para amanhã: {predict[0]}")
+
+    resultado = {}
+
+    for i in np.arange(1, 11):
+        evidence = {
+            'cluster_rt-37': df_clustered.iloc[-37-i]['cluster_rt'],
+            'cluster_rt-5': df_clustered.iloc[-5-i]['cluster_rt'],
+            'cluster_rt-1': df_clustered.iloc[-1-i]['cluster_rt']
+            }
+        
+        predict = predict_model(model, evidence=evidence)
+
+        resultado[i] = [predict[0]['cluster_rt'], df_clustered.iloc[i]['cluster_rt']]
+
+
+    resultado = pd.DataFrame.from_dict(resultado, orient='columns')
+    resultado.rename(index={0: 'Previsão', 1: 'Real'}, inplace=True)
+
+    st.dataframe(resultado)
 
     # fig = plt.figure(figsize=(20, 4))
     # ax = fig.add_subplot(111)
@@ -70,11 +89,6 @@ def main():
     st.line_chart(df[['Close']])
 
     st.line_chart(df["rt"])
-
-    st.dataframe(df_clustered.iloc[-1])
-
-    
-
 
 
 if __name__ == '__main__':
