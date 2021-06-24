@@ -23,11 +23,11 @@ def main():
 
     st.markdown(f"# {page_selection}")
 
-    # end_date = date.today()
-    # start_date = end_date - timedelta(days=3150)
+    end_date = date.today()
+    start_date = end_date - timedelta(days=3150)
 
-    start_date = datetime.strptime('2004-11-02', '%Y-%m-%d')
-    end_date = datetime.strptime('2008-11-28', '%Y-%m-%d')
+    # start_date = datetime.strptime('2004-11-02', '%Y-%m-%d')
+    # end_date = datetime.strptime('2008-11-28', '%Y-%m-%d')
 
     start_date = st.sidebar.date_input('Start date', start_date)
     end_date = st.sidebar.date_input('End date', end_date)
@@ -78,8 +78,12 @@ def main():
 
     rt_mean = round(resultado.groupby(by=["Real"]).agg({"rt": ["min", "max","count", "mean"]}), 2)[("rt", "mean")]
 
-    conditions = [resultado["Previsão"]==1.0, resultado["Previsão"]==2.0, resultado["Previsão"]==3.0, resultado["Previsão"]==4.0]
+    conditions = [
+        resultado["Previsão"]==1.0, resultado["Previsão"]==2.0, resultado["Previsão"]==3.0
+        , resultado["Previsão"]==4.0, resultado["Previsão"]==5.0, resultado["Previsão"]==6.0]
+
     choices = rt_mean.tolist()
+    
     resultado["rt_predict"] = np.select(conditions, choices, default=np.nan)
 
     st.dataframe(resultado)
