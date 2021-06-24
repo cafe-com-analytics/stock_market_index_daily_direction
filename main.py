@@ -1,8 +1,9 @@
-from datetime import date, timedelta
+from datetime import date, timedelta, datetime
 
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
+from sklearn.metrics import accuracy_score, mean_squared_error
 import streamlit as st
 import yfinance as yf
 
@@ -22,15 +23,18 @@ def main():
 
     st.markdown(f"# {page_selection}")
 
-    end_date = date.today()
-    start_date = end_date - timedelta(days=3150)
+    # end_date = date.today()
+    # start_date = end_date - timedelta(days=3150)
+
+    start_date = datetime.strptime('2004-11-02', '%Y-%m-%d')
+    end_date = datetime.strptime('2008-11-28', '%Y-%m-%d')
 
     start_date = st.sidebar.date_input('Start date', start_date)
     end_date = st.sidebar.date_input('End date', end_date)
 
     df = yf.download(dct_market[page_selection]["index_name"], start=start_date, end=end_date)
 
-    df["rt"] = (np.log(df["Close"]) - np.log(df["Close"].shift(periods=1)))
+    df["rt"] = (np.log(df["Close"]) - np.log(df["Close"].shift(periods=1)))*100
 
     df = create_shifted_rt(df, [1, 5, 37])
 
@@ -39,15 +43,17 @@ def main():
 
     lst_relations = [('cluster_rt-37', 'cluster_rt'), ('cluster_rt-5', 'cluster_rt'), ('cluster_rt-1', 'cluster_rt')]
 
-    df_clustered = df_clustered[["cluster_rt-37", "cluster_rt-5", "cluster_rt-1", "cluster_rt"]]
+    df_clustered = df_clustered[["rt", "cluster_rt-37", "cluster_rt-5", "cluster_rt-1", "cluster_rt"]]
 
-    model = train_model(df_clustered.iloc[:-10], lst_relations)
+    predict_n_days = 20
+
+    model = train_model(df_clustered.iloc[:-predict_n_days], lst_relations)
 
     evidence = {
-    'cluster_rt-37': df_clustered.iloc[-37]['cluster_rt'],
-    'cluster_rt-5': df_clustered.iloc[-5]['cluster_rt'],
-    'cluster_rt-1': df_clustered.iloc[-1]['cluster_rt']
-    }
+        'cluster_rt-37': df_clustered.iloc[-37]['cluster_rt'],
+        'cluster_rt-5': df_clustered.iloc[-5]['cluster_rt'],
+        'cluster_rt-1': df_clustered.iloc[-1]['cluster_rt']
+        }
 
     predict = predict_model(model, evidence=evidence)
 
@@ -55,7 +61,8 @@ def main():
 
     resultado = {}
 
-    for i in np.arange(1, 11):
+    for i in np.arange(1, predict_n_days+1):
+
         evidence = {
             'cluster_rt-37': df_clustered.iloc[-37-i]['cluster_rt'],
             'cluster_rt-5': df_clustered.iloc[-5-i]['cluster_rt'],
@@ -64,14 +71,26 @@ def main():
         
         predict = predict_model(model, evidence=evidence)
 
-        resultado[i] = [predict[0]['cluster_rt'], df_clustered.iloc[i]['cluster_rt']]
+        resultado[i] = [predict[0]['cluster_rt'], df_clustered.iloc[i]['cluster_rt'], df_clustered.iloc[i]['rt']]
 
+    resultado = pd.DataFrame.from_dict(resultado, orient='index')
+    resultado.rename(columns={0: 'Previsão', 1: 'Real', 2:'rt'}, inplace=True)
 
-    resultado = pd.DataFrame.from_dict(resultado, orient='columns')
-    resultado.rename(index={0: 'Previsão', 1: 'Real'}, inplace=True)
+    rt_mean = round(resultado.groupby(by=["Real"]).agg({"rt": ["min", "max","count", "mean"]}), 2)[("rt", "mean")]
+
+    conditions = [resultado["Previsão"]==1.0, resultado["Previsão"]==2.0, resultado["Previsão"]==3.0, resultado["Previsão"]==4.0]
+    choices = rt_mean.tolist()
+    resultado["rt_predict"] = np.select(conditions, choices, default=np.nan)
 
     st.dataframe(resultado)
 
+    rmse_uniform = mean_squared_error(resultado["rt"], resultado["rt_predict"], squared=False)
+
+    acuracia = accuracy_score(resultado["Real"], resultado["Previsão"], normalize=True)
+
+    st.text(f"Acurácia: {round(acuracia*100, 2)}%")
+    st.text(f"RMSE: {round(rmse_uniform, 2)}%")
+    
     # fig = plt.figure(figsize=(20, 4))
     # ax = fig.add_subplot(111)
 
@@ -90,6 +109,7 @@ def main():
 
     st.line_chart(df["rt"])
 
+    st.dataframe(df_clustered[['Close', 'rt', 'cluster_rt']].tail(10))
 
 if __name__ == '__main__':
     main()

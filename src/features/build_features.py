@@ -18,7 +18,7 @@ def uniform_clustering(df: pd.DataFrame, lst_columns: list) -> pd.DataFrame:
             (df[column] >= 0) & (df[column] < 0.44),
             (df[column] >= 0.44) & (df[column] < 1.07),
             df[column] >= 1.07]
-        # choices = [ "C1", "C2", "C3", "C4", "C5", "C6"]
+        
         choices = [ 1, 2, 3, 4, 5, 6]
         df["cluster_"+column] = np.select(conditions, choices, default=np.nan)
     
