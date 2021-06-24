@@ -86,6 +86,11 @@ def main():
     
     resultado["rt_predict"] = np.select(conditions, choices, default=np.nan)
 
+    resultado = resultado[::-1]
+
+    resultado["rt_predict_acumulado"] = resultado["rt_predict"].cumsum()
+    resultado["rt_acumulado"] = resultado["rt"].cumsum()
+
     st.dataframe(resultado)
 
     rmse_uniform = mean_squared_error(resultado["rt"], resultado["rt_predict"], squared=False)
