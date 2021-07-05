@@ -78,9 +78,14 @@ def main():
 
     rt_mean = round(resultado.groupby(by=["Real"]).agg({"rt": ["min", "max","count", "mean"]}), 2)[("rt", "mean")]
 
-    conditions = [
-        resultado["Previsão"]==1.0, resultado["Previsão"]==2.0, resultado["Previsão"]==3.0
-        , resultado["Previsão"]==4.0, resultado["Previsão"]==5.0, resultado["Previsão"]==6.0]
+    if page_selection == "Nikkey":
+        conditions = [
+            resultado["Previsão"]==1.0, resultado["Previsão"]==2.0, resultado["Previsão"]==3.0
+            , resultado["Previsão"]==4.0, resultado["Previsão"]==5.0, resultado["Previsão"]==6.0]
+    elif page_selection == "Bovespa":
+        conditions = [
+            resultado["Previsão"]==1.0, resultado["Previsão"]==2.0,
+            resultado["Previsão"]==3.0, resultado["Previsão"]==4.0]
 
     choices = rt_mean.tolist()
     
@@ -118,7 +123,7 @@ def main():
 
     st.line_chart(df["rt"])
 
-    st.dataframe(df_clustered[['Close', 'rt', 'cluster_rt']].tail(10))
+    # st.dataframe(df_clustered[['Close', 'rt', 'cluster_rt']].tail(10))
 
 if __name__ == '__main__':
     main()
