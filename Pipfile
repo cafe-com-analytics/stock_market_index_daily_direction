@@ -17,7 +17,8 @@ openpyxl = "*"
 requests = "*"
 bs4 = "*"
 streamlit = "*"
-pmdarima = "*"
+pygraphviz = "*"
+numpy = "*"
 
 [dev-packages]
 
