@@ -19,6 +19,8 @@ bs4 = "*"
 streamlit = "*"
 pygraphviz = "*"
 numpy = "*"
+html5lib = "*"
+python-dotenv = "*"
 
 [dev-packages]
 
