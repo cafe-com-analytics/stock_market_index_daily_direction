@@ -18,6 +18,8 @@ requests = "*"
 bs4 = "*"
 streamlit = "*"
 pmdarima = "*"
+prince = "*"
+mca = "*"
 
 [dev-packages]
 
