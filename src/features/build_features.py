@@ -3,7 +3,7 @@ import pandas as pd
 import yfinance as yf
 
 
-def downloading_stocks_data(dct, start_date: str = "2011-01-01", end_date: str = "2022-01-01") -> pd.DataFrame:
+def downloading_stocks_data(dct, start_date: str = "2021-01-01", end_date: str = "2021-07-01") -> pd.DataFrame:
     """
     Download the stocks daily information from tickers listed as keys of a dictionary, gets only "Close" price from
     each day within start_date and end_date.
@@ -36,7 +36,7 @@ def daily_return(df, lst_columns: list = 'all') -> pd.DataFrame:
     Return the daily return of the lst_columns.
     """
     if lst_columns == 'all':
-        df.columns = df.columns.tolit()
+        lst_columns = df.columns.tolist()
     elif isinstance(lst_columns, list):
         pass
     else:
@@ -44,6 +44,8 @@ def daily_return(df, lst_columns: list = 'all') -> pd.DataFrame:
 
     for column in lst_columns:
         df[column] = (np.log(df[column]) - np.log(df[column].shift(periods=1)))*100
+
+    df.dropna(axis=0, how='all', inplace=True)
 
     return df
 
@@ -53,7 +55,7 @@ def return_in_period(df, lst_columns: list = 'all') -> pd.DataFrame:
     Return the return of the lst_columns.
     """
     if lst_columns == 'all':
-        df.columns = df.columns.tolit()
+        lst_columns = df.columns.tolist()
     elif isinstance(lst_columns, list):
         pass
     else:
@@ -72,7 +74,7 @@ def create_shifted_rt(df: pd.DataFrame, rts: list) -> pd.DataFrame:
 
 
 def uniform_clustering(df: pd.DataFrame, lst_columns: list) -> pd.DataFrame:
-    """This function creates the target "Cluster" according to the limits described in article."""
+    """This function creates the target "Cluster" according to the limits described in  (2011, Zuo and Kita)."""
     for column in lst_columns:
         conditions = [
             df[column] < -1.12,
@@ -84,5 +86,29 @@ def uniform_clustering(df: pd.DataFrame, lst_columns: list) -> pd.DataFrame:
 
         choices = [1, 2, 3, 4, 5, 6]
         df["cluster_"+column] = np.select(conditions, choices, default=np.nan)
+
+    return df
+
+
+def binary_clustering(df: pd.DataFrame, lst_columns: list = 'all') -> pd.DataFrame:
+    """
+    This function creates the target "Cluster" according to the limits described in article.
+
+    Args:
+        df (pd.DataFrame): [description]
+        lst_columns (list): [description]
+
+    Returns:
+        pd.DataFrame: return 'cluster_'+column with values 1 for positive return and 0 for equal or below zero.
+    """
+    if lst_columns == 'all':
+        lst_columns = df.columns.tolist()
+    elif isinstance(lst_columns, list):
+        pass
+    else:
+        lst_columns = list(lst_columns)
+
+    for column in lst_columns:
+        df["cluster_"+column] = np.where(df[column] > 0, '1', 0)
 
     return df
