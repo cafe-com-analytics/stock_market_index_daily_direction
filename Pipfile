@@ -20,6 +20,8 @@ streamlit = "*"
 pmdarima = "*"
 prince = "*"
 mca = "*"
+scikit-fuzzy = "*"
+pandas-datareader = "*"
 
 [dev-packages]
 flake8 = "*"
