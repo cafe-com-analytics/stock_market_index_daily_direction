@@ -67,9 +67,20 @@ def return_in_period(df, lst_columns: list = 'all') -> pd.DataFrame:
     return df
 
 
-def create_shifted_rt(df: pd.DataFrame, rts: list) -> pd.DataFrame:
+def create_shifted_rt(df, rts: list, column_name: str = 'Close') -> pd.DataFrame:
+    """
+    Return a dataframe with new lagged columns according to a rts' list.
+
+    Args:
+        df (pd.DataFrame): [description]
+        rts (list): list with int values. Each value represents a lag in period.
+        column_name (str, optional): [description]. Defaults to 'Close'.
+
+    Returns:
+        pd.DataFrame: [description]
+    """
     for t in rts:
-        df[f"rt-{t}"] = df["rt"].shift(periods=t)
+        df[f"{column_name}-{t}"] = df[column_name].shift(periods=t)
     return df
 
 
