@@ -84,8 +84,15 @@ def create_shifted_rt(df, rts: list, column_name: str = 'Close') -> pd.DataFrame
     return df
 
 
-def uniform_clustering(df: pd.DataFrame, lst_columns: list) -> pd.DataFrame:
+def uniform_clustering(df: pd.DataFrame, lst_columns: list = 'all') -> pd.DataFrame:
     """This function creates the target "Cluster" according to the limits described in  (2011, Zuo and Kita)."""
+    if lst_columns == 'all':
+        lst_columns = df.columns.tolist()
+    elif isinstance(lst_columns, list):
+        pass
+    else:
+        lst_columns = list(lst_columns)
+
     for column in lst_columns:
         conditions = [
             df[column] < -1.12,

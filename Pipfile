@@ -22,6 +22,7 @@ prince = "*"
 mca = "*"
 scikit-fuzzy = "*"
 pandas-datareader = "*"
+numpy = "*"
 
 [dev-packages]
 flake8 = "*"
