@@ -23,6 +23,8 @@ mca = "*"
 scikit-fuzzy = "*"
 pandas-datareader = "*"
 numpy = "*"
+graphviz = "*"
+pydot = "*"
 
 [dev-packages]
 flake8 = "*"

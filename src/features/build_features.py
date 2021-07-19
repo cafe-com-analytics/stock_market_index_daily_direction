@@ -80,7 +80,7 @@ def create_shifted_rt(df, rts: list, column_name: str = 'Close') -> pd.DataFrame
         pd.DataFrame: [description]
     """
     for t in rts:
-        df[f"{column_name}-{t}"] = df[column_name].shift(periods=t)
+        df[f"rt-{t}"] = df[column_name].shift(periods=t)
     return df
 
 
@@ -127,6 +127,6 @@ def binary_clustering(df: pd.DataFrame, lst_columns: list = 'all') -> pd.DataFra
         lst_columns = list(lst_columns)
 
     for column in lst_columns:
-        df["cluster_"+column] = np.where(df[column] > 0, '1', 0)
+        df["cluster_"+column] = np.where(df[column] > 0, 1, 0)
 
     return df
