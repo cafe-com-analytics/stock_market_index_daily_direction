@@ -130,3 +130,29 @@ def binary_clustering(df: pd.DataFrame, lst_columns: list = 'all') -> pd.DataFra
         df["cluster_"+column] = np.where(df[column] > 0, 1, 0)
 
     return df
+
+
+def boxplot_clustering(df: pd.DataFrame, lst_columns: list = 'all') -> pd.DataFrame:
+    if lst_columns == 'all':
+        lst_columns = df.columns.tolist()
+    elif isinstance(lst_columns, list):
+        pass
+    else:
+        lst_columns = list(lst_columns)
+
+    df_boxplot = df.describe().T
+    quartile_1 = df_boxplot["25%"][0]
+    quartile_2 = df_boxplot["50%"][0]
+    quartile_3 = df_boxplot["75%"][0]
+
+    for column in lst_columns:
+        conditions = [
+            (df[column] < quartile_1),
+            (df[column] >= quartile_1) & (df[column] < quartile_2),
+            (df[column] >= quartile_2) & (df[column] < quartile_3),
+            (df[column] >= quartile_3)]
+
+        choices = [int(1), int(2), int(3), int(4)]
+        df["cluster_"+column] = np.select(conditions, choices, default=np.nan)
+
+    return df
