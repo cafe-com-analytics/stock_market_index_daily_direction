@@ -25,6 +25,7 @@ pandas-datareader = "*"
 numpy = "*"
 graphviz = "*"
 pydot = "*"
+notebook = "*"
 
 [dev-packages]
 flake8 = "*"
